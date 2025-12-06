@@ -1,5 +1,5 @@
 import numpy as np
-
+# SEMANA 9
 def lagrange_eval_api(x_eval, x_puntos, y_puntos):
     n = len(x_puntos)
     total = 0.0
@@ -196,3 +196,4 @@ def resolver_lagrange_con_pasos_reales(x_puntos, y_puntos, x_eval=None):
             "puntos_y": ys.tolist()
         }
     }
+# SEMANA 10

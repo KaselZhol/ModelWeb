@@ -368,3 +368,100 @@ def resolver_newton_web(x_puntos, y_puntos, x_eval=None):
         },
         "pasos": pasos_explicativos
     }
+    
+def resolver_newton_universal_web(x_puntos, y_puntos, x_eval=None, valor_real=None):
+    """
+    Resuelve Newton para CUALQUIER set de datos (Seno, Exponencial, etc.)
+    y devuelve el paso a paso detallado para la web.
+    """
+    xs = np.array(x_puntos, dtype=float)
+    ys = np.array(y_puntos, dtype=float)
+    n = len(xs)
+    
+    pasos = []
+    pasos.append("--- INICIO: Interpolación de Newton ---")
+    
+    # 1. Construir la Tabla de Diferencias Divididas (Matriz n x n)
+    # Usamos una matriz completa para poder mostrarla en el Frontend
+    tabla = np.zeros((n, n))
+    tabla[:, 0] = ys # Primera columna = f(x)
+    
+    pasos.append(f"Datos iniciales cargados: {n} puntos.")
+
+    # --- BUCLE DE CÁLCULO DE LA TABLA ---
+    for j in range(1, n):
+        pasos.append(f"\n--- Generando Diferencias de Orden {j} ---")
+        for i in range(n - j):
+            # Fórmula: (Abajo - Arriba) / (X_lejos - X_cerca)
+            numerador = tabla[i+1, j-1] - tabla[i, j-1]
+            denominador = xs[i+j] - xs[i]
+            
+            valor = numerador / denominador
+            tabla[i, j] = valor
+            
+            # Explicación detallada para el estudiante
+            pasos.append(
+                f"f[x{i}...x{i+j}] = ({tabla[i+1, j-1]:.5f} - {tabla[i, j-1]:.5f}) / ({xs[i+j]:.4f} - {xs[i]:.4f}) = {valor:.6f}"
+            )
+
+    # Los coeficientes finales (b0, b1, b2...) son la primera fila
+    coeficientes = tabla[0, :]
+
+    # 2. Construir el Texto de la Ecuación
+    # P(x) = b0 + b1(x-x0) + ...
+    poly_str = f"{coeficientes[0]:.4f}"
+    for k in range(1, n):
+        signo = "+" if coeficientes[k] >= 0 else "-"
+        # Construimos los términos (x-x0)(x-x1)...
+        terminos_x = ""
+        for m in range(k):
+            terminos_x += f"(x - {xs[m]:.2f})"
+        
+        poly_str += f" {signo} {abs(coeficientes[k]):.4f}*{terminos_x}"
+
+    # 3. Función Interna de Evaluación (Horner)
+    def evaluar_newton(val_x):
+        res = coeficientes[n-1]
+        for k in range(n-2, -1, -1):
+            res = res * (val_x - xs[k]) + coeficientes[k]
+        return res
+
+    # 4. Datos para Gráfica (100 puntos)
+    x_min, x_max = min(xs), max(xs)
+    padding = (x_max - x_min) * 0.2
+    x_grafica = np.linspace(x_min - padding, x_max + padding, 100)
+    y_grafica = [evaluar_newton(val) for val in x_grafica]
+
+    # 5. Evaluación Puntual y Cálculo de Error
+    resultado_puntual = None
+    error_abs = None
+    
+    if x_eval is not None:
+        resultado_puntual = evaluar_newton(x_eval)
+        pasos.append(f"\nEVALUACIÓN: Sustituyendo x={x_eval:.4f} en el polinomio...")
+        pasos.append(f"Resultado aproximado P({x_eval:.4f}) = {resultado_puntual:.6f}")
+        
+        # Si nos dieron el valor real (ej: math.sin(x)), calculamos el error
+        if valor_real is not None:
+            error_abs = abs(valor_real - resultado_puntual)
+            pasos.append(f"COMPARACIÓN: Valor Real = {valor_real:.6f} | Error Absoluto = {error_abs:.6f}")
+
+    # --- RETORNO JSON ---
+    return {
+        "ecuacion_texto": poly_str,
+        "tabla_diferencias": tabla.tolist(), # Para pintar la tabla en HTML
+        "coeficientes": coeficientes.tolist(),
+        "resultado": {
+            "x": x_eval,
+            "y_aprox": resultado_puntual,
+            "y_real": valor_real,
+            "error": error_abs
+        },
+        "grafica": {
+            "x": x_grafica.tolist(),
+            "y": y_grafica,
+            "puntos_x": xs.tolist(),
+            "puntos_y": ys.tolist()
+        },
+        "pasos": pasos # El historial completo
+    }

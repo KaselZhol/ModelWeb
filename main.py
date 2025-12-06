@@ -749,4 +749,90 @@ def resolver_edo_universal_web(f_prime_str, x0, y0, h, pasos_num, metodo="euler"
         },
         "pasos": historial_pasos
     }
+    
 # SEMANA 15
+def resolver_solo_rk2(ecuacion_str, t0, y0, h, pasos_num):
+    ts = [t0]
+    ys = [y0]
+    pasos_explicativos = []
+    
+    pasos_explicativos.append(f"--- MÉTODO RK2 (HEUN) ---")
+    
+    t_actual = t0
+    y_actual = y0
+    
+    def f(t, y):
+        ctx = {"t": t, "y": y, "sin": math.sin, "cos": math.cos, "exp": math.exp}
+        return eval(ecuacion_str, {"__builtins__": None}, ctx)
+
+    for i in range(pasos_num):
+        # Lógica RK2
+        k1 = f(t_actual, y_actual)
+        k2 = f(t_actual + h, y_actual + h * k1)
+        
+        pendiente_promedio = (k1 + k2) / 2.0
+        y_siguiente = y_actual + h * pendiente_promedio
+        
+        texto = (
+            f"Paso {i+1}:\n"
+            f"   -> k1 (inicio) = {k1:.6f}\n"
+            f"   -> k2 (fin estimado) = {k2:.6f}\n"
+            f"   -> Promedio (k1+k2)/2 = {pendiente_promedio:.6f}\n"
+            f"   -> Nuevo y = {y_actual:.6f} + {h} * {pendiente_promedio:.6f} = {y_siguiente:.6f}"
+        )
+        pasos_explicativos.append(texto)
+        
+        t_actual += h
+        y_actual = y_siguiente
+        ts.append(t_actual)
+        ys.append(y_actual)
+
+    return {
+        "metodo": "RK2 (Heun)",
+        "grafica": {"t": ts, "y": ys},
+        "resultado_final": y_actual,
+        "pasos": pasos_explicativos
+    }
+def resolver_solo_rk4(ecuacion_str, t0, y0, h, pasos_num):
+    ts = [t0]
+    ys = [y0]
+    pasos_explicativos = []
+    
+    pasos_explicativos.append(f"--- MÉTODO RK4 ---")
+    
+    t_actual = t0
+    y_actual = y0
+    
+    def f(t, y):
+        ctx = {"t": t, "y": y, "sin": math.sin, "cos": math.cos, "exp": math.exp}
+        return eval(ecuacion_str, {"__builtins__": None}, ctx)
+
+    for i in range(pasos_num):
+        # Lógica RK4
+        k1 = f(t_actual, y_actual)
+        k2 = f(t_actual + h/2, y_actual + (h/2)*k1)
+        k3 = f(t_actual + h/2, y_actual + (h/2)*k2)
+        k4 = f(t_actual + h, y_actual + h*k3)
+        
+        pendiente_ponderada = (k1 + 2*k2 + 2*k3 + k4) / 6.0
+        y_siguiente = y_actual + h * pendiente_ponderada
+        
+        texto = (
+            f"Paso {i+1}:\n"
+            f"   -> k1={k1:.4f}, k2={k2:.4f}, k3={k3:.4f}, k4={k4:.4f}\n"
+            f"   -> Pendiente Ponderada = {pendiente_ponderada:.6f}\n"
+            f"   -> Nuevo y = {y_actual:.6f} + {h} * {pendiente_ponderada:.6f} = {y_siguiente:.6f}"
+        )
+        pasos_explicativos.append(texto)
+        
+        t_actual += h
+        y_actual = y_siguiente
+        ts.append(t_actual)
+        ys.append(y_actual)
+
+    return {
+        "metodo": "RK4",
+        "grafica": {"t": ts, "y": ys},
+        "resultado_final": y_actual,
+        "pasos": pasos_explicativos
+    }

@@ -125,3 +125,74 @@ def resolver_lagrange_web(x_puntos, y_puntos, x_eval=None):
         },
         "pasos": pasos_explicativos # <--- Aquí viaja la explicación completa
     }
+    
+def resolver_lagrange_con_pasos_reales(x_puntos, y_puntos, x_eval=None):
+    xs = np.array(x_puntos, dtype=float)
+    ys = np.array(y_puntos, dtype=float)
+    n = len(xs)
+    
+    pasos_explicativos = []
+    pasos_explicativos.append("--- INICIO: Construcción del Polinomio de Lagrange ---")
+    pasos_explicativos.append(f"Fórmula general: P(x) = Σ y_i * L_i(x)")
+    
+    result_coeffs = np.zeros(n)
+    
+    # BUCLE PRINCIPAL
+    for i in range(n):
+        # 1. Preparar datos
+        xi, yi = xs[i], ys[i]
+        xs_excl = np.delete(xs, i) # Puntos restantes (xj)
+        
+        # 2. Calcular Numerador y Denominador
+        numer_coeffs = np.poly(xs_excl) # Coeficientes de (x-x0)(x-x1)...
+        denom = np.prod(xi - xs_excl)   # Valor escalar (xi-x0)(xi-x1)...
+        
+        # 3. Calcular el Polinomio de este término (Li)
+        # Li_coeffs = (yi / denom) * numer_coeffs
+        peso = yi / denom
+        termino_coeffs = peso * numer_coeffs
+        
+        # Ajuste de tamaño (Padding) para sumar
+        if len(termino_coeffs) < len(result_coeffs):
+            diferencia = len(result_coeffs) - len(termino_coeffs)
+            termino_coeffs = np.pad(termino_coeffs, (diferencia, 0), 'constant')
+        
+        result_coeffs = result_coeffs + termino_coeffs
+        
+        # --- AQUÍ ESTÁ LA MEJORA VISUAL DE LOS PASOS ---
+        # Convertimos el array de coeficientes actual a texto bonito: "2x^2 + 3"
+        # Usamos np.poly1d solo para formatear el texto automáticamente
+        poly_str = str(np.poly1d(termino_coeffs)).strip().replace("\n", " ")
+        
+        paso_texto = (
+            f"Paso {i}: Usando punto P{i}({xi}, {yi})\n"
+            f"   -> Calculamos L_{i}(x). El denominador es: Π(xi - xj) = {denom:.2f}\n"
+            f"   -> El peso (yi / denom) es: {yi} / {denom:.2f} = {peso:.4f}\n"
+            f"   -> Término agregado al polinomio final: {poly_str}"
+        )
+        pasos_explicativos.append(paso_texto)
+
+    # Polinomio Final
+    P = np.poly1d(result_coeffs)
+    
+    # Datos Gráfica
+    x_min, x_max = min(xs), max(xs)
+    padding = (x_max - x_min) * 0.2
+    x_grafica = np.linspace(x_min - padding, x_max + padding, 100)
+    y_grafica = P(x_grafica)
+
+    resultado_eval = None
+    if x_eval is not None:
+        resultado_eval = float(P(x_eval))
+        pasos_explicativos.append(f"EVALUACIÓN: P({x_eval}) = {resultado_eval:.6f}")
+
+    return {
+        "ecuacion_final": str(P).strip(),
+        "pasos": pasos_explicativos, # <--- AQUÍ ESTÁN TUS PASOS
+        "grafica": {
+            "x": x_grafica.tolist(),
+            "y": y_grafica.tolist(),
+            "puntos_x": xs.tolist(),
+            "puntos_y": ys.tolist()
+        }
+    }

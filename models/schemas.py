@@ -71,7 +71,7 @@ class EDOInput(BaseModel):
     y0: float = Field(..., description="Valor inicial de y")
     h: float = Field(..., description="Tamaño del paso")
     pasos: int = Field(..., description="Cantidad de iteraciones a realizar")
-    
+    metodo: str = "euler"  # <--- ESTO ES LO QUE FALTABA
     # Campos Opcionales (Solo para Taylor o cálculo de error)
     ecuacion_segunda_derivada: Optional[str] = Field(None, description="Solo para Taylor: Ecuación de y'' (puedes usar 'yp')")
     solucion_exacta: Optional[str] = Field(None, description="Opcional: Para calcular el error real")

@@ -8,15 +8,17 @@ router = APIRouter()
 @router.post("/universal")
 def calcular_euler_taylor(datos: EDOInput):
     """
-    Resuelve EDOs básicas.
-    Si envías 'ecuacion_segunda_derivada', usa Taylor Orden 2.
-    Si no, usa Euler.
+    Resuelve EDOs. Obedece el campo 'metodo' que envía el frontend.
     """
     try:
-        # Lógica de decisión simple
-        metodo_a_usar = "euler"
-        if datos.ecuacion_segunda_derivada:
-            metodo_a_usar = "taylor2"
+        # ANTES (Lógica automática que vamos a BORRAR):
+        # metodo_a_usar = "euler"
+        # if datos.ecuacion_segunda_derivada:
+        #    metodo_a_usar = "taylor2"
+
+        # AHORA (Obedecer al cliente):
+        # Si el usuario no manda nada, por defecto será euler (definido en tu modelo o aquí)
+        metodo_a_usar = datos.metodo if datos.metodo else "euler"
 
         return resolver_edo_universal_web(
             f_prime_str=datos.ecuacion,
@@ -24,7 +26,7 @@ def calcular_euler_taylor(datos: EDOInput):
             y0=datos.y0,
             h=datos.h,
             pasos_num=datos.pasos,
-            metodo=metodo_a_usar,
+            metodo=metodo_a_usar, # <--- Usamos lo que eligió el usuario
             f_double_prime_str=datos.ecuacion_segunda_derivada,
             sol_exacta_str=datos.solucion_exacta
         )

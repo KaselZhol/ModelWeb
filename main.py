@@ -1,8 +1,7 @@
-import numpy as np
-import math
-import pandas as pd
 from fastapi import FastAPI
-# Importamos los routers que acabamos de crear
+from fastapi.middleware.cors import CORSMiddleware # <--- IMPORTANTE: Importar esto
+
+# Importamos los routers (Nota: Asegúrate de que el archivo routers/EMR.py exista)
 from routers import interpolacion, EMR, integracion, edo
 
 # Configuración del Servidor
@@ -12,12 +11,24 @@ app = FastAPI(
     version="3.0.0"
 )
 
+# --- CONFIGURACIÓN DE SEGURIDAD (CORS) ---
+# ESTO ES LO QUE TE FALTABA.
+# Sin esto, Next.js recibirá un error "Network Error" o "CORS Error".
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # "*" permite que CUALQUIER web se conecte (ideal para desarrollo)
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos los métodos (POST, GET, etc.)
+    allow_headers=["*"],
+)
+
 # --- CONEXIÓN DE ROUTERS (Las Zonas del Restaurante) ---
 
 # Zona 1: Interpolación (Lagrange / Newton)
 app.include_router(interpolacion.router, prefix="/interpolacion", tags=["Semana 9-10: Interpolación"])
 
 # Zona 2: Ajuste de Curvas (Mínimos Cuadrados)
+# Nota: Veo que llamaste al archivo "EMR". Asegúrate de que en la carpeta routers se llame "EMR.py"
 app.include_router(EMR.router, prefix="/ajuste", tags=["Semana 11: Ajuste de Curvas"])
 
 # Zona 3: Integración Numérica

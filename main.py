@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware # <--- IMPORTANTE: Importar esto
-
+from routers import ai
 # Importamos los routers (Nota: Asegúrate de que el archivo routers/EMR.py exista)
 from routers import interpolacion, EMR, integracion, edo
 
@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 # --- CONEXIÓN DE ROUTERS (Las Zonas del Restaurante) ---
-
+app.include_router(ai.router, prefix="/ai")
 # Zona 1: Interpolación (Lagrange / Newton)
 app.include_router(interpolacion.router, prefix="/interpolacion", tags=["Semana 9-10: Interpolación"])
 

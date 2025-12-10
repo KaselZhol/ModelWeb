@@ -6,6 +6,6 @@ scipy
 matplotlib
 sympy
 python-multipart
-google-generativeai
 pillow
 pandas
+google-generativeai>=0.7.2

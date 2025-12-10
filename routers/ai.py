@@ -40,12 +40,12 @@ async def scan_math_problem(file: UploadFile = File(...)):
             "ruta_sugerida": "/ruta/detectada",
             "parametros": {
                 "ecuacion": "string o null",
-                "t0": numero o null,
-                "y0": numero o null,
-                "h": numero o null,
-                "a": numero o null,
-                "b": numero o null,
-                "n": numero o null,
+                "t0": numero (float/int) o null,  <-- CAMBIO AQUÍ
+                "y0": numero (float/int) o null,
+                "h": numero (float/int) o null,
+                "a": numero (float/int) o null,
+                "b": numero (float/int) o null,
+                "n": numero (float/int) o null,
                 "x_str": "1,2,3,4" (si es tabla, como string separado por comas),
                 "y_str": "2,4,6,8" (si es tabla)
             }

@@ -4,10 +4,9 @@ from pydantic import BaseModel
 from PIL import Image
 import io
 import json
+import os
 
-# --- CONFIGURACIÓN ---
-# Pega tu API Key aquí (o usa os.getenv para más seguridad)
-GOOGLE_API_KEY = "TU_API_KEY_DE_GOOGLE_AQUI" 
+GOOGLE_API_KEY=os.getenv("AIzaSyCQpiopLmZNkFdZnrmiihr7mV5dV6THXss")
 
 genai.configure(api_key=GOOGLE_API_KEY)
 

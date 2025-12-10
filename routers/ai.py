@@ -11,7 +11,7 @@ GOOGLE_API_KEY=os.getenv("AIzaSyCQpiopLmZNkFdZnrmiihr7mV5dV6THXss")
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Usamos el modelo Flash que es rápido y gratuito
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 router = APIRouter()
 
@@ -60,4 +60,16 @@ async def scan_math_problem(file: UploadFile = File(...)):
 
     except Exception as e:
         # ... manejo de errores ...
+        return {"error": str(e)}
+    
+@router.get("/test-models")
+def list_models():
+    """Ruta temporal para ver qué modelos funcionan"""
+    try:
+        modelos = []
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                modelos.append(m.name)
+        return {"modelos_disponibles": modelos}
+    except Exception as e:
         return {"error": str(e)}

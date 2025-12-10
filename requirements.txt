@@ -3,3 +3,6 @@ uvicorn
 numpy
 pandas
 pydantic
+google-generativeai
+pillow
+python-multipart

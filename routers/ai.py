@@ -11,7 +11,7 @@ GOOGLE_API_KEY=os.getenv("AIzaSyCQpiopLmZNkFdZnrmiihr7mV5dV6THXss")
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Usamos el modelo Flash que es rápido y gratuito
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-flash-latest')
 
 router = APIRouter()
 
